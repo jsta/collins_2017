@@ -36,8 +36,11 @@ fit <- plsdepot::plsreg2(dt[,c("ln_Urban_iws", "ln_Pasture_iws",
                          "NO3deposition_hu12", "X30yrPrecip_hu12", 
                          "Baseflow_hu12", "ln_maxdepth", 
                          "ln_ResTime_lawa", "X30yrTemp_hu12")], 
-                  dt[,c("ln_TP", "ln_TNTP", "ln_TN")])
+                  dt[,c("ln_TP", "ln_TNTP", "ln_TN")], comps = 1)
 
 knitr::kable(round(fit$std.coefs, 2))
 
+knitr::kable(fit$expvar[1,])
+
+knitr::kable(fit$VIP[,1])
 ```
