@@ -1,9 +1,43 @@
 ---
 title: "Collins 2017"
-output: html_document
+output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r message=FALSE}
+library(LAGOSNE)
+library(dplyr)
+library(plsdepot)
+library(knitr)
+
+dt <- LAGOSNE::lagos_load_collins_2017()
+dt <- dplyr::filter(dt, Region == "Midwestern")
+
+# In the Midwestern U.S. region, dominated by agricultural land use, lake depth
+# and the percentage of row crop agriculture were strong predictors of 
+# stoichiometry because: 
+#  * **only phosphorus was related to lake depth** 
+#  * **only nitrogen was related to the percentage of row crop agriculture**
+
+coefs <- round(abs(
+  lm(ln_TP ~ ln_Urban_iws + ln_Pasture_iws + ln_RowCrop_iws + 
+     ln_Forest_iws + NO3deposition_hu12 + X30yrPrecip_hu12 + 
+     Baseflow_hu12 + ln_maxdepth + ln_ResTime_lawa + 
+     X30yrTemp_hu12, data = dt)$
+    coefficients), 2)
+      
+knitr::kable(coefs[order(coefs)])
+
+fit <- plsdepot::plsreg2(dt[,c("ln_Urban_iws", "ln_Pasture_iws", 
+                         "ln_RowCrop_iws", "ln_Forest_iws", 
+                         "NO3deposition_hu12", "X30yrPrecip_hu12", 
+                         "Baseflow_hu12", "ln_maxdepth", 
+                         "ln_ResTime_lawa", "X30yrTemp_hu12")], 
+                  dt[,c("ln_TP", "ln_TNTP", "ln_TN")])
+
+knitr::kable(round(fit$std.coefs, 2))
+
+```
